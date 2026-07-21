@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Moodbar</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-source="web">
+  <main class="moodbar">
+    <h1>Comment te sens-tu aujourd'hui ?</h1>
+
+    <div class="buttons">
+      <button class="mood-btn" data-mood="content" aria-label="Content">🙂</button>
+      <button class="mood-btn" data-mood="neutre" aria-label="Neutre">😐</button>
+      <button class="mood-btn" data-mood="pas_content" aria-label="Pas content">🙁</button>
+    </div>
+
+    <p id="feedback" class="feedback" aria-live="polite"></p>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

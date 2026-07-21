@@ -1,0 +1,121 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f6fa;
+  font-family: system-ui, sans-serif;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+.moodbar {
+  text-align: center;
+  padding: 2rem 1rem;
+  width: 100%;
+  max-width: 28rem;
+}
+
+h1 {
+  font-size: 1.5rem;
+  color: #2d2d2d;
+  margin-bottom: 2rem;
+  line-height: 1.3;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+.mood-btn {
+  font-size: 3rem;
+  padding: 1rem 1.5rem;
+  border: none;
+  border-radius: 1rem;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.mood-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+.mood-btn:active {
+  transform: scale(0.95);
+}
+
+.feedback {
+  margin-top: 2rem;
+  min-height: 1.5rem;
+  font-size: 1.1rem;
+  color: #444;
+}
+
+/* ne réduit que si l'écran est trop étroit pour les 3 boutons en taille normale (le kiosque n'est jamais concerné, sa surcharge .kiosk .mood-btn est plus spécifique) */
+@media (max-width: 400px) {
+  h1 {
+    font-size: 1.25rem;
+  }
+
+  .buttons {
+    gap: 0.75rem;
+  }
+
+  .mood-btn {
+    font-size: 2.25rem;
+    padding: 0.65rem 0.9rem;
+  }
+}
+
+.kiosk {
+  max-width: none;
+  width: auto;
+}
+
+.kiosk h1 {
+  font-size: 2.2rem;
+}
+
+.kiosk .mood-btn {
+  font-size: 5rem;
+  padding: 1.5rem 2rem;
+}
+
+.kiosk .feedback {
+  font-size: 1.4rem;
+}
+
+/* même logique que le point de rupture web, mais calé plus large car les boutons du kiosque sont naturellement plus grands */
+@media (max-width: 560px) {
+  .kiosk h1 {
+    font-size: 1.8rem;
+  }
+
+  .kiosk .mood-btn {
+    font-size: 3.5rem;
+    padding: 1rem 1.25rem;
+  }
+
+  .kiosk .buttons {
+    gap: 1rem;
+  }
+}
+
+.kiosk-note {
+  margin-top: 3rem;
+  font-size: 0.8rem;
+  color: #999;
+}

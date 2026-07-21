@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moodbar — Maquettes &amp; conception UX</title>
+<link rel="stylesheet" href="../moodbar-frontend/style.css">
+<style>
+  body {
+    display: block;
+    min-height: 0;
+    background: #ffffff;
+    color: #2d2d2d;
+    padding: 2rem clamp(1rem, 5vw, 4rem);
+  }
+
+  .intro {
+    max-width: 46rem;
+    margin: 0 auto 2.5rem;
+  }
+
+  .intro h1 {
+    font-size: 1.8rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .intro p {
+    line-height: 1.5;
+  }
+
+  .tabs {
+    max-width: 60rem;
+    margin: 0 auto;
+  }
+
+  .tabs input[type="radio"] {
+    display: none;
+  }
+
+  .tab-labels {
+    display: flex;
+    gap: 0.5rem;
+    border-bottom: 2px solid #e3e5eb;
+    margin-bottom: 1.5rem;
+  }
+
+  .tab-labels label {
+    padding: 0.75rem 1.25rem;
+    cursor: pointer;
+    border-radius: 0.5rem 0.5rem 0 0;
+    color: #666;
+    font-weight: 600;
+  }
+
+  .tab-panel {
+    display: none;
+    grid-template-columns: minmax(280px, 380px) 1fr;
+    gap: 2rem;
+  }
+
+  #tab-web:checked ~ .tab-labels label[for="tab-web"],
+  #tab-kiosk:checked ~ .tab-labels label[for="tab-kiosk"],
+  #tab-dashboard:checked ~ .tab-labels label[for="tab-dashboard"] {
+    color: #2d2d2d;
+    border-bottom: 2px solid #2d2d2d;
+    margin-bottom: -2px;
+  }
+
+  #tab-web:checked ~ #panel-web,
+  #tab-kiosk:checked ~ #panel-kiosk,
+  #tab-dashboard:checked ~ #panel-dashboard {
+    display: grid;
+  }
+
+  .frame {
+    background: #f5f6fa;
+    border-radius: 1rem;
+    border: 1px solid #e3e5eb;
+    overflow: hidden;
+  }
+
+  .frame-bar {
+    background: #e3e5eb;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.75rem;
+    color: #666;
+    display: flex;
+    gap: 0.35rem;
+    align-items: center;
+  }
+
+  .frame-bar span {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: #bbb;
+    display: inline-block;
+  }
+
+  .frame-body {
+    padding: 2rem 1rem;
+  }
+
+  .frame.kiosk-frame .frame-body {
+    padding: 1.5rem 0.5rem;
+  }
+
+  .annotations h2 {
+    font-size: 1.2rem;
+    margin-top: 0;
+  }
+
+  .annotations ul {
+    padding-left: 1.1rem;
+    line-height: 1.6;
+  }
+
+  .annotations li {
+    margin-bottom: 0.6rem;
+  }
+
+  .annotations code {
+    background: #f0f0f5;
+    padding: 0.1rem 0.35rem;
+    border-radius: 0.3rem;
+    font-size: 0.85em;
+  }
+
+  /* wireframe du dashboard : pas de capture réelle possible ici (app Streamlit dynamique),
+     représentation fidèle à la structure de moodbar-dashboard/app.py */
+  .wf { color: #2d2d2d; }
+  .wf-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem; }
+  .wf-btn { display: inline-block; background: #fff; border: 1px solid #ccc; border-radius: 0.4rem; padding: 0.3rem 0.9rem; font-size: 0.85rem; margin-bottom: 1.2rem; }
+  .wf-row { display: flex; gap: 0.75rem; margin-bottom: 1.2rem; }
+  .wf-card { flex: 1; background: #fff; border: 1px solid #e3e5eb; border-radius: 0.5rem; padding: 0.75rem; text-align: center; }
+  .wf-card .label { font-size: 0.75rem; color: #888; }
+  .wf-card .value { font-size: 1.4rem; font-weight: 700; }
+  .wf-chart { background: #fff; border: 1px solid #e3e5eb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.2rem; }
+  .wf-bars { display: flex; align-items: flex-end; gap: 0.75rem; height: 90px; }
+  .wf-bars div { flex: 1; background: #9aa5f0; border-radius: 0.2rem 0.2rem 0 0; }
+  .wf-line { height: 70px; background: linear-gradient(to right, transparent 49%, #ccc 49%, #ccc 51%, transparent 51%),
+             repeating-linear-gradient(to right, transparent, transparent 19%, #eee 19%, #eee 20%);
+             position: relative; }
+  .wf-line svg { width: 100%; height: 100%; }
+  .wf-table { background: #fff; border: 1px solid #e3e5eb; border-radius: 0.5rem; padding: 0.75rem; font-size: 0.8rem; color: #888; }
+  .wf-table .row { display: flex; justify-content: space-between; padding: 0.3rem 0; border-bottom: 1px solid #f0f0f5; }
+</style>
+</head>
+<body>
+
+<div class="intro">
+  <h1>Moodbar — Maquettes &amp; conception UX</h1>
+  <p>
+    Ce document présente les 3 écrans du MVP et les choix d'expérience utilisateur qui les sous-tendent.
+    Les aperçus web et borne ci-dessous réutilisent directement le CSS du prototype
+    (<code>moodbar-frontend/style.css</code>) : ce ne sont pas des captures d'écran figées mais un rendu
+    fidèle du même code. Le dashboard, lui, est une application Streamlit dynamique — l'aperçu ci-dessous
+    est donc un wireframe qui reproduit sa structure réelle (<code>moodbar-dashboard/app.py</code>), pas un
+    rendu pixel-perfect.
+  </p>
+</div>
+
+<div class="tabs">
+  <input type="radio" name="tab" id="tab-web" checked>
+  <input type="radio" name="tab" id="tab-kiosk">
+  <input type="radio" name="tab" id="tab-dashboard">
+
+  <div class="tab-labels">
+    <label for="tab-web">Application web</label>
+    <label for="tab-kiosk">Borne IoT (simulée)</label>
+    <label for="tab-dashboard">Dashboard analytique</label>
+  </div>
+
+  <div class="tab-panel" id="panel-web">
+    <div class="frame">
+      <div class="frame-bar"><span></span><span></span><span></span> moodbar-frontend/index.html</div>
+      <div class="frame-body">
+        <main class="moodbar">
+          <h1>Comment te sens-tu aujourd'hui ?</h1>
+          <div class="buttons">
+            <button class="mood-btn" aria-label="Content">🙂</button>
+            <button class="mood-btn" aria-label="Neutre">😐</button>
+            <button class="mood-btn" aria-label="Pas content">🙁</button>
+          </div>
+          <p class="feedback">Super, continue comme ça !</p>
+        </main>
+      </div>
+    </div>
+    <div class="annotations">
+      <h2>Choix UX</h2>
+      <ul>
+        <li><strong>3 boutons uniques</strong>, aucune autre action possible : le vote se fait en un geste, sans réflexion.</li>
+        <li><strong>Aucune authentification</strong> ni saisie : l'anonymat encourage la sincérité du vote.</li>
+        <li><strong>Feedback immédiat</strong> (son + message affiché, ici <code>#feedback</code>) : transforme un simple clic en interaction gratifiante.</li>
+        <li>Le message se <strong>réinitialise après 4s</strong> pour que l'écran reste net pour le prochain passage.</li>
+        <li>Accessible sur poste fixe, tablette ou smartphone sans installation (page web standard).</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="panel-kiosk">
+    <div class="frame kiosk-frame">
+      <div class="frame-bar"><span></span><span></span><span></span> moodbar-frontend/kiosk.html</div>
+      <div class="frame-body">
+        <main class="moodbar kiosk">
+          <h1>Comment te sens-tu aujourd'hui ?</h1>
+          <div class="buttons">
+            <button class="mood-btn" aria-label="Content">🙂</button>
+            <button class="mood-btn" aria-label="Neutre">😐</button>
+            <button class="mood-btn" aria-label="Pas content">🙁</button>
+          </div>
+          <p class="feedback"></p>
+          <p class="kiosk-note">Borne simulée — Moodbar</p>
+        </main>
+      </div>
+    </div>
+    <div class="annotations">
+      <h2>Choix UX</h2>
+      <ul>
+        <li><strong>Boutons et texte agrandis</strong> par rapport à la version web : pensé pour un usage tactile, à distance, dans un lieu de passage (hall, cafétéria...).</li>
+        <li>Même code que l'application web (<code>script.js</code> partagé) : seul <code>data-source="iot"</code> change, pour distinguer l'origine du vote en base.</li>
+        <li>La mention <strong>« Borne simulée »</strong> est volontairement visible : transparence vis-à-vis du jury sur l'absence de matériel physique (contrainte budget, voir <code>REQUIREMENTS.md</code>).</li>
+        <li>Aucune barre de navigateur visible en usage réel (mode kiosque plein écran du navigateur).</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="panel-dashboard">
+    <div class="frame">
+      <div class="frame-bar"><span></span><span></span><span></span> moodbar-dashboard/app.py (wireframe)</div>
+      <div class="frame-body wf">
+        <div class="wf-title">🙂😐🙁 Moodbar — Dashboard analytique</div>
+        <div class="wf-btn">↻ Actualiser</div>
+        <div class="wf-row">
+          <div class="wf-card"><div class="label">🙂 Content</div><div class="value">5</div></div>
+          <div class="wf-card"><div class="label">😐 Neutre</div><div class="value">3</div></div>
+          <div class="wf-card"><div class="label">🙁 Pas content</div><div class="value">2</div></div>
+        </div>
+        <div class="wf-chart">
+          <div class="wf-bars">
+            <div style="height:100%"></div>
+            <div style="height:60%"></div>
+            <div style="height:40%"></div>
+          </div>
+        </div>
+        <div class="wf-chart">
+          <svg viewBox="0 0 200 60" preserveAspectRatio="none">
+            <polyline points="0,45 40,30 80,35 120,15 160,20 200,10" fill="none" stroke="#9aa5f0" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="wf-table">
+          <div class="row"><span>2026-07-21 09:14</span><span>content</span><span>web</span></div>
+          <div class="row"><span>2026-07-21 08:52</span><span>neutre</span><span>iot</span></div>
+          <div class="row"><span>2026-07-20 17:30</span><span>pas_content</span><span>web</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="annotations">
+      <h2>Choix UX</h2>
+      <ul>
+        <li><strong>3 métriques en tête</strong> : lecture immédiate de la répartition globale, sans interprétation nécessaire.</li>
+        <li><strong>Filtre de période</strong> (sélecteur de dates) + <strong>granularité jour/semaine/mois</strong> : permet de zoomer sur un événement précis (période d'examens, etc.).</li>
+        <li>Graphique d'évolution en <strong>courbe</strong> : les pics/anomalies (ex. baisse de moral) sautent visuellement aux yeux.</li>
+        <li><strong>Table de détail</strong> en bas de page : accès aux données brutes pour vérification, sans être la première chose vue.</li>
+        <li>Bouton <strong>« Actualiser »</strong> + cache de 30s : équilibre entre fraîcheur des données et charge sur la base, sans complexité de websocket.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

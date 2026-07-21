@@ -1,0 +1,10 @@
+CREATE DATABASE IF NOT EXISTS moodbar;
+USE moodbar;
+
+CREATE TABLE IF NOT EXISTS votes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  humeur ENUM('content', 'neutre', 'pas_content') NOT NULL,
+  horodatage DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  source VARCHAR(10) NOT NULL,
+  lieu VARCHAR(100) NULL
+);
