@@ -44,3 +44,7 @@ Crée la base `moodbar` et la table `votes`.
 |---|---|---|
 | POST | `/api/votes` | Enregistre un vote (`humeur`, `source`, `lieu` optionnel) |
 | GET | `/api/votes` | Liste les derniers votes (paramètre `limit`, défaut 100) |
+
+
+# OBS
+BDD en local : pas optimal

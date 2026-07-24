@@ -13,6 +13,7 @@
 - [Stack technique](#stack-technique)
 - [Dashboard analytique](#dashboard-analytique)
 - [Cas d'usage](#cas-dusage)
+- [Démarrage rapide](#démarrage-rapide)
 - [État du projet](#état-du-projet)
 
 ## Contexte et objectifs
@@ -125,13 +126,30 @@ Cet outil est destiné aux équipes pédagogiques et administratives afin de mie
 - **Un étudiant** ouvre l'application web pour signaler son humeur du jour et reçoit un message d'encouragement.
 - **L'administration** consulte le dashboard chaque semaine pour suivre l'évolution du moral général et anticiper d'éventuelles périodes de tension (avant les partiels, par exemple).
 
+## Démarrage rapide
+
+Le MVP est fonctionnel de bout en bout en local (application web, borne IoT simulée, API et dashboard). Pour le lancer :
+
+1. **Backend + frontend** : voir [moodbar-backend/README.md](moodbar-backend/README.md) — installation, configuration MySQL, lancement du serveur FastAPI (qui sert aussi le frontend sur la même origine, `/` et `/kiosk.html`).
+2. **Dashboard analytique** : voir [moodbar-dashboard/README.md](moodbar-dashboard/README.md) — connexion à la même base MySQL, lancement de l'app Streamlit.
+
 ## État du projet
 
-Le projet en est actuellement au stade de conception. Les prochaines étapes prévues sont :
+Le MVP est **fonctionnel de bout en bout en local** : les trois briques (application web, borne IoT simulée, backend/API, dashboard) sont développées, connectées entre elles et testées avec des données réelles. Il reste principalement à valider l'usage en conditions réelles au sein d'un établissement.
 
-- [x] Définition de la stack technique (application web, backend, base de données, borne IoT simulée). Dashboard encore à trancher.
+- [x] Définition de la stack technique (application web, backend, base de données, borne IoT simulée, dashboard).
 - [x] Développement de la borne IoT simulée (page web mode kiosque).
 - [x] Développement de l'application web et de l'API de collecte (FastAPI + MySQL, testé de bout en bout en local).
 - [x] Développement du dashboard de visualisation (Streamlit, connecté à la même base MySQL, testé de bout en bout avec des données réelles).
 - [x] Conception détaillée de l'interface utilisateur (maquettes) — voir [docs/maquettes.html](docs/maquettes.html).
 - [ ] Phase de test en conditions réelles au sein de l'établissement.
+- [ ] Choix et mise en place de l'hébergement (offre gratuite/free-tier) pour un déploiement accessible hors local.
+
+### Pistes d'évolution (hors MVP)
+
+Envisageables une fois le MVP validé en conditions réelles, mais hors périmètre pour l'instant (voir [REQUIREMENTS.md](REQUIREMENTS.md#hors-périmètre-pour-linstant)) :
+
+- Déploiement de la borne IoT sur un vrai dispositif physique (Raspberry Pi, ESP32...) plutôt que la version simulée en page web.
+- Support multi-établissement.
+- Analyse de sentiment / traitement du langage naturel plus poussé sur les tendances.
+- Application mobile native.

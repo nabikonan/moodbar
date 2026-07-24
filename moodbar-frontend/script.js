@@ -23,8 +23,15 @@ const frequencies = {
   pas_content: 300
 };
 
+// un seul AudioContext réutilisé : en créer un nouveau à chaque clic sans le fermer
+// épuise la limite de contextes simultanés du navigateur (ex. 6 sur Chrome) au bout de quelques votes
+let audioCtx;
+
 function playTone(frequency) {
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  const ctx = audioCtx;
   const oscillator = ctx.createOscillator();
   const gain = ctx.createGain();
 
@@ -46,16 +53,15 @@ function randomMessage(mood) {
 
 const source = document.body.dataset.source || "web";
 
-// TODO: brancher sur l'API réelle une fois le backend disponible (voir REQUIREMENTS.md)
 async function sendVote(mood) {
-  try {
-    await fetch("/api/votes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ humeur: mood, source })
-    });
-  } catch (error) {
-    console.log("Backend indisponible pour le moment, vote non envoyé :", mood);
+  const response = await fetch("/api/votes", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ humeur: mood, source })
+  });
+
+  if (!response.ok) {
+    throw new Error(`Erreur serveur (${response.status})`);
   }
 }
 
@@ -63,21 +69,34 @@ const feedback = document.getElementById("feedback");
 let feedbackTimeout;
 
 document.querySelectorAll(".mood-btn").forEach((button) => {
-  button.addEventListener("click", () => {
+  button.addEventListener("click", async () => {
     const mood = button.dataset.mood;
 
-    playTone(frequencies[mood]);
-    feedback.textContent = randomMessage(mood);
-    sendVote(mood);
+    try {
+      playTone(frequencies[mood]);
+    } catch (error) {
+      console.log("Son non joué :", error);
+    }
 
     if (navigator.vibrate) {
       navigator.vibrate(30);
+    }
+
+    try {
+      await sendVote(mood);
+      feedback.classList.remove("feedback-error");
+      feedback.textContent = randomMessage(mood);
+    } catch (error) {
+      console.log("Vote non enregistré :", mood, error);
+      feedback.classList.add("feedback-error");
+      feedback.textContent = "Oups, ton vote n'a pas pu être envoyé. Réessaie dans un instant.";
     }
 
     // remet l'écran à zéro après un délai, pour le prochain votant (surtout utile en mode kiosque)
     clearTimeout(feedbackTimeout);
     feedbackTimeout = setTimeout(() => {
       feedback.textContent = "";
+      feedback.classList.remove("feedback-error");
     }, 4000);
   });
 });

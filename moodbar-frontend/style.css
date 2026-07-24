@@ -64,6 +64,11 @@ h1 {
   color: #444;
 }
 
+.feedback-error {
+  color: #c0392b;
+  font-weight: 600;
+}
+
 /* ne réduit que si l'écran est trop étroit pour les 3 boutons en taille normale (le kiosque n'est jamais concerné, sa surcharge .kiosk .mood-btn est plus spécifique) */
 @media (max-width: 400px) {
   h1 {
