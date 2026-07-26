@@ -3,6 +3,7 @@ import warnings
 
 import mysql.connector
 import pandas as pd
+import plotly.graph_objects as go
 import streamlit as st
 from dotenv import load_dotenv
 
@@ -14,8 +15,28 @@ warnings.filterwarnings("ignore", message="pandas only supports SQLAlchemy")
 
 st.set_page_config(page_title="Moodbar — Dashboard", page_icon="🙂")
 
+# mêmes couleurs que moodbar-frontend/style.css (bordures des mood-btn), pour une identité
+# visuelle cohérente entre le vote et le dashboard
 MOODS = ["content", "neutre", "pas_content"]
 MOOD_LABELS = {"content": "🙂 Content", "neutre": "😐 Neutre", "pas_content": "🙁 Pas content"}
+MOOD_COLORS = {"content": "#4caf7d", "neutre": "#e0b23d", "pas_content": "#e2685f"}
+
+# thème carte pour les st.metric + fond de page, dans l'esprit du mockup fourni
+st.markdown(
+    """
+    <style>
+    .stApp { background-color: #f7f5f2; }
+    [data-testid="stMetric"] {
+        background-color: #ffffff;
+        border: 1px solid #e8e4dd;
+        border-radius: 0.75rem;
+        padding: 1rem 1rem 0.75rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 
 def get_connection():
@@ -60,7 +81,34 @@ counts = filtered["humeur"].value_counts().reindex(MOODS, fill_value=0)
 col1, col2, col3 = st.columns(3)
 for col, mood in zip((col1, col2, col3), MOODS):
     col.metric(MOOD_LABELS[mood], counts[mood])
-st.bar_chart(counts.rename(MOOD_LABELS))
+
+# le donut porte lui-même le libellé + pourcentage sur chaque part (pas seulement la couleur) :
+# cf. vérification d'accessibilité couleur (voir résumé) — neutre/pas_content se confondent
+# en deutéranopie, donc l'identité ne doit jamais reposer sur la seule teinte
+donut = go.Figure(
+    data=[
+        go.Pie(
+            labels=[MOOD_LABELS[m] for m in MOODS],
+            values=[counts[m] for m in MOODS],
+            hole=0.55,
+            sort=False,
+            direction="clockwise",
+            marker=dict(colors=[MOOD_COLORS[m] for m in MOODS], line=dict(color="#ffffff", width=2)),
+            textinfo="percent",
+            textposition="outside",
+            hovertemplate="%{label}<br>%{value} votes (%{percent})<extra></extra>",
+        )
+    ]
+)
+donut.update_layout(
+    showlegend=True,
+    legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="center", x=0.5),
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
+    font=dict(color="#6b6b6b"),
+    margin=dict(t=10, b=10, l=10, r=10),
+)
+st.plotly_chart(donut, use_container_width=True)
 
 st.subheader("Évolution dans le temps")
 period = st.radio("Granularité", ["Jour", "Semaine", "Mois"], horizontal=True)
@@ -70,9 +118,34 @@ trend = (
     .size()
     .unstack(fill_value=0)
     .reindex(columns=MOODS, fill_value=0)
-    .rename(columns=MOOD_LABELS)
 )
-st.line_chart(trend)
+
+bars = go.Figure()
+for mood in MOODS:
+    bars.add_trace(
+        go.Bar(
+            x=trend.index,
+            y=trend[mood],
+            name=MOOD_LABELS[mood],
+            marker=dict(color=MOOD_COLORS[mood]),
+            hovertemplate="%{y} votes<extra>" + MOOD_LABELS[mood] + "</extra>",
+        )
+    )
+bars.update_layout(
+    barmode="group",
+    bargap=0.25,
+    bargroupgap=0.08,
+    hovermode="x unified",
+    showlegend=True,
+    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
+    font=dict(color="#6b6b6b"),
+    margin=dict(t=40, b=10, l=10, r=10),
+    xaxis=dict(showgrid=False),
+    yaxis=dict(showgrid=True, gridcolor="#eceae5", zeroline=False),
+)
+st.plotly_chart(bars, use_container_width=True)
 
 st.subheader("Détail des votes")
 st.dataframe(filtered.sort_values("horodatage", ascending=False), use_container_width=True)

@@ -100,3 +100,10 @@ document.querySelectorAll(".mood-btn").forEach((button) => {
     }, 4000);
   });
 });
+
+// absent sur kiosk.html (borne publique) : ce lien n'existe que sur index.html
+const adminLink = document.getElementById("admin-link");
+if (adminLink) {
+  // port fixe (Streamlit), hostname dynamique pour fonctionner aussi bien en local qu'en LAN
+  adminLink.href = `${location.protocol}//${location.hostname}:8501`;
+}

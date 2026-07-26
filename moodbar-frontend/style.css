@@ -13,11 +13,54 @@ body {
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
+/* la page web (avec branding) remonte le contenu vers le haut ; la borne kiosque
+   (sans .brand) garde le centrage vertical d'origine */
+body:has(.brand) {
+  align-items: flex-start;
+  padding-top: clamp(2rem, 8vh, 5rem);
+}
+
 .moodbar {
   text-align: center;
   padding: 2rem 1rem;
   width: 100%;
   max-width: 28rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.brand-logo {
+  width: 3.5rem;
+  height: 3.5rem;
+  object-fit: contain;
+  border-radius: 0.4rem;
+}
+
+.brand-text {
+  text-align: left;
+}
+
+.brand-name {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #2d2d2d;
+  line-height: 1.1;
+}
+
+.brand-school {
+  margin: 0.15rem 0 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #e2622f;
 }
 
 h1 {
@@ -123,4 +166,17 @@ h1 {
   margin-top: 3rem;
   font-size: 0.8rem;
   color: #999;
+}
+
+.admin-link {
+  display: inline-block;
+  margin-top: 3rem;
+  font-size: 0.75rem;
+  color: #aaa;
+  text-decoration: none;
+}
+
+.admin-link:hover {
+  color: #888;
+  text-decoration: underline;
 }
