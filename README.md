@@ -2,7 +2,7 @@
 
 **Moodbar** est un système de monitoring de l'humeur en temps réel, conçu pour les établissements d'enseignement supérieur. Le projet combine une application web et un dispositif IoT afin de mesurer, visualiser et analyser en continu l'état émotionnel des étudiants au sein d'un établissement.
 
-> **Note sur le MVP** : projet académique sans budget matériel alloué. La borne IoT est donc **simulée en logiciel** (une page web dédiée en mode kiosque, pas de matériel physique) pour cette version. Le déploiement sur un vrai dispositif IoT reste envisageable en roadmap future.
+> **Note sur le MVP** : la borne IoT est un **prototype matériel réel** (Arduino Uno + LCD, boutons, LEDs, buzzer — voir [moodbar-iot/](moodbar-iot/)). Une page web dédiée en mode kiosque (`kiosk.html`) reste disponible comme solution de secours logicielle (démo sans matériel, développement avant que le boîtier soit imprimé).
 
 ## Sommaire
 
@@ -53,13 +53,17 @@ L'interface a été pensée pour être **simple, épurée et intuitive**, afin d
 Moodbar repose sur deux points de collecte complémentaires qui alimentent un backend commun et un dashboard partagé :
 
 ```
-┌─────────────────┐        ┌─────────────────┐
-│   Application    │        │   Borne IoT       │
-│   Web (3 boutons)│        │   simulée (page   │
-│                  │        │   web, mode       │
-│                  │        │   kiosque)        │
-└────────┬─────────┘        └────────┬──────────┘
-         │                           │
+┌─────────────────┐        ┌─────────────────────┐
+│   Application    │        │   Borne IoT           │
+│   Web (3 boutons)│        │   (Arduino Uno +       │
+│                  │        │   LCD/LED/buzzer)      │
+└────────┬─────────┘        └────────┬────────────────┘
+         │                           │ port série
+         │                           ▼
+         │                  ┌─────────────────────┐
+         │                  │  Bridge Python        │
+         │                  │  (moodbar-iot/bridge) │
+         │                  └────────┬────────────────┘
          │      Vote (humeur +       │
          │        horodatage)        │
          └───────────┬───────────────┘
@@ -82,7 +86,7 @@ Moodbar repose sur deux points de collecte complémentaires qui alimentent un ba
 ```
 
 - **Application web** : point de collecte accessible depuis un navigateur (poste fixe, tablette, smartphone).
-- **Borne IoT** : pour le MVP, simulée par une page web dédiée en mode kiosque (mêmes 3 boutons, pensée pour un usage sans smartphone ni souris/clavier). Un vrai dispositif physique (hall, cafétéria, bibliothèque...) reste une évolution possible hors MVP.
+- **Borne IoT** : prototype matériel Arduino Uno (LCD, 3 boutons, LEDs, buzzer — voir [moodbar-iot/](moodbar-iot/)), qui transmet chaque vote par port série à un bridge Python relayant vers la même API que l'application web. Une page web dédiée en mode kiosque (`kiosk.html`) reste disponible comme solution de secours logicielle.
 - **Backend** : centralise les votes, les horodate, les stocke et les rend disponibles en temps réel pour l'analyse.
 - **Dashboard** : interface de visualisation à destination de l'établissement, affichant les tendances globales de l'humeur (par période, par lieu, par événement...).
 
@@ -99,7 +103,8 @@ La stack est choisie en priorité parmi les langages/outils déjà maîtrisés, 
 | Base de données | MySQL |
 | Gestion de version | Git / GitHub |
 | Scripts / automatisation | Bash |
-| Borne IoT (simulée) | HTML, CSS, JavaScript — page dédiée en mode kiosque, même stack que le frontend |
+| Borne IoT | Arduino Uno (C++), bridge Python (série → API) — voir [moodbar-iot/](moodbar-iot/) |
+| Borne IoT (secours logiciel) | HTML, CSS, JavaScript — page dédiée en mode kiosque, même stack que le frontend |
 | Dashboard analytique | Python (Streamlit) |
 
 ### À définir
@@ -132,16 +137,23 @@ Le MVP est fonctionnel de bout en bout en local (application web, borne IoT simu
 
 1. **Backend + frontend** : voir [moodbar-backend/README.md](moodbar-backend/README.md) — installation, configuration MySQL, lancement du serveur FastAPI (qui sert aussi le frontend sur la même origine, `/` et `/kiosk.html`).
 2. **Dashboard analytique** : voir [moodbar-dashboard/README.md](moodbar-dashboard/README.md) — connexion à la même base MySQL, lancement de l'app Streamlit.
+3. **Borne IoT (Arduino)** : voir [moodbar-iot/firmware/README.md](moodbar-iot/firmware/README.md) pour flasher le sketch, puis [moodbar-iot/bridge/README.md](moodbar-iot/bridge/README.md) pour lancer le bridge série → API.
 
 ## État du projet
 
-Le MVP est **fonctionnel de bout en bout en local** : les trois briques (application web, borne IoT simulée, backend/API, dashboard) sont développées, connectées entre elles et testées avec des données réelles. Il reste principalement à valider l'usage en conditions réelles au sein d'un établissement.
+Le MVP est **fonctionnel de bout en bout en local** : application web, backend/API
+et dashboard sont développés, connectés entre eux et testés avec des données
+réelles. La borne IoT dispose désormais d'un prototype matériel (firmware Arduino
++ bridge Python) en plus de sa version de secours logicielle.
 
-- [x] Définition de la stack technique (application web, backend, base de données, borne IoT simulée, dashboard).
-- [x] Développement de la borne IoT simulée (page web mode kiosque).
+- [x] Définition de la stack technique (application web, backend, base de données, borne IoT, dashboard).
+- [x] Développement de la borne IoT simulée (page web mode kiosque), conservée comme solution de secours.
 - [x] Développement de l'application web et de l'API de collecte (FastAPI + MySQL, testé de bout en bout en local).
 - [x] Développement du dashboard de visualisation (Streamlit, connecté à la même base MySQL, testé de bout en bout avec des données réelles).
 - [x] Conception détaillée de l'interface utilisateur (maquettes) — voir [docs/maquettes.html](docs/maquettes.html).
+- [x] Conception du prototype matériel de la borne IoT (firmware Arduino, brochage, bridge série → API) — voir [moodbar-iot/](moodbar-iot/).
+- [ ] Vérification du firmware sur matériel réel (aucun Arduino disponible pour compiler/tester dans cet environnement).
+- [ ] Modélisation 3D finale et impression du boîtier — voir [docs/boitier-arduino.md](docs/boitier-arduino.md).
 - [ ] Phase de test en conditions réelles au sein de l'établissement.
 - [ ] Choix et mise en place de l'hébergement (offre gratuite/free-tier) pour un déploiement accessible hors local.
 
@@ -149,7 +161,6 @@ Le MVP est **fonctionnel de bout en bout en local** : les trois briques (applica
 
 Envisageables une fois le MVP validé en conditions réelles, mais hors périmètre pour l'instant (voir [REQUIREMENTS.md](REQUIREMENTS.md#hors-périmètre-pour-linstant)) :
 
-- Déploiement de la borne IoT sur un vrai dispositif physique (Raspberry Pi, ESP32...) plutôt que la version simulée en page web.
 - Support multi-établissement.
 - Analyse de sentiment / traitement du langage naturel plus poussé sur les tendances.
 - Application mobile native.

@@ -5,7 +5,7 @@ Ce document recense les contraintes, exigences et décisions (prises ou en atten
 ## Cadre du projet
 
 - **Projet académique** : le MVP doit être défendable devant un jury et devant des chefs d'établissement potentiellement intéressés. Chaque choix technique doit être compris de bout en bout par l'équipe (langage, outils, code, fonctionnement, impacts) — pas de solution "boîte noire" qu'on ne saurait pas expliquer.
-- **Budget** : aucun budget alloué en dehors du temps investi. Toute solution impliquant une dépense (achat de matériel, service payant, hébergement payant) est **hors périmètre du MVP**.
+- **Budget** : aucun budget alloué en dehors du temps investi, à une exception près : le matériel de la borne IoT (voir [Matériel](#matériel)), approuvé pour ce MVP. Toute autre dépense (service payant, hébergement payant, matériel additionnel) reste **hors périmètre du MVP**.
 
 ## Contraintes techniques
 
@@ -43,6 +43,31 @@ Table `votes` :
 
 À ajuster une fois le backend en cours de conception.
 
+## Matériel
+
+Borne IoT physique (voir [moodbar-iot/](moodbar-iot/)) : Arduino Uno, LCD 16x2 en
+câblage parallèle (pas de module I2C), 3 boutons poussoirs, LED verte, LED jaune,
+LED rouge, 3 résistances 220 Ω, buzzer, breadboard, fils de connexion. Pas de
+servo-moteur pour cette première version.
+
+Brochage (montage réel) :
+
+| Composant | Broche |
+|---|---|
+| LED verte (Heureux) | D7 |
+| LED jaune (Neutre) | D9 |
+| LED rouge (Triste) | D10 |
+| Bouton Heureux | D13 |
+| Bouton Neutre | D6 |
+| Bouton Triste | A4 |
+| Buzzer | D8 |
+| LCD RS | D12 |
+| LCD E | D11 |
+| LCD D4 | D5 |
+| LCD D5 | D4 |
+| LCD D6 | D3 |
+| LCD D7 | D2 |
+
 ## Décisions ouvertes
 
 - **Hébergement / déploiement** : uniquement des offres gratuites (ex. free-tier Render/Railway/PythonAnywhere, GitHub Pages pour le frontend statique) — à confirmer une fois le backend fonctionnel en local.
@@ -50,7 +75,7 @@ Table `votes` :
 
 ## Décisions tranchées
 
-- **Borne IoT → simulée en logiciel** : pas de matériel physique (Raspberry Pi, ESP32...) pour le MVP, contrainte budget oblige. Une page web dédiée, pensée pour un usage "kiosque" (mêmes 3 boutons), tient ce rôle. Le déploiement sur un vrai dispositif reste une évolution possible hors MVP, hors périmètre pour l'instant.
+- **Borne IoT → prototype matériel Arduino Uno** : LCD, boutons, LEDs et buzzer pilotés par un Arduino Uno (voir [moodbar-iot/](moodbar-iot/) et [Matériel](#matériel)), qui transmet les votes en série à un bridge Python relayant vers l'API backend existante — même flux que l'application web. La page web dédiée en mode kiosque (`kiosk.html`) est conservée comme **solution de secours logicielle** (démo sans matériel, développement avant que le boîtier soit imprimé).
 - **Dashboard analytique → Python (Streamlit)** : reste dans le même langage que le backend (un seul écosystème Python à gérer), et se connecte directement à la même base MySQL.
 
 ## Hors périmètre (pour l'instant)
@@ -59,5 +84,4 @@ Table `votes` :
 - Analyse de sentiment avancée / traitement du langage naturel.
 - Support multi-établissement.
 - Application mobile native.
-- Toute solution impliquant une dépense : achat de matériel (Raspberry Pi, ESP32, capteurs...), hébergement payant, services tiers payants.
-- Déploiement de la borne IoT sur un vrai dispositif physique.
+- Toute solution impliquant une dépense au-delà du matériel de la borne IoT déjà approuvé (voir [Matériel](#matériel)) : hébergement payant, services tiers payants, matériel additionnel (Raspberry Pi, ESP32, capteurs...).
